@@ -98,7 +98,7 @@ end
 -- Define a tag table which hold all screen tags.
 tags = {}
 tags_numbered = false
-tag_names = { "[1]", "[2]", "[3]", "[4]", "[5]", "[6]", "[7]", "[8]", "[9]" }
+tag_names = { "[1]", "[2]", "[3]", "[4]", "[5]", "[6]", "[7]", "[8]", "[9]", "[A]", "[B]", "[C]" }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
     tags[s] = awful.tag(tag_names, s, layouts[3])
@@ -111,8 +111,8 @@ end
 detailed_graphs = uzful.menu.toggle_widgets()
 
 taglist_filter = uzful.util.functionlist({
-    awful.widget.taglist.filter.noempty,
-    awful.widget.taglist.filter.all })
+    awful.widget.taglist.filter.all,
+	awful.widget.taglist.filter.noempty })
 
 local menu_graph_text = function ()
     return (detailed_graphs.visible() and "disable" or "enable") .. " graphs"
@@ -124,9 +124,9 @@ end
 
 local menu_taglist_text = function ()
     if taglist_filter.current() == 1 then
-        return "show all tags"
-    elseif taglist_filter.current() == 2 then
         return "hide empty tags"
+    elseif taglist_filter.current() == 2 then
+        return "show all tags"
     else
         return "nil"
     end
@@ -137,6 +137,13 @@ end
 myawesomemenu = {
    {"wallpapers", uzful.menu.wallpaper.menu(theme.wallpapers)},
    { "manual", terminal .. " -e man awesome" },
+   { menu_taglist_text(), function (m)
+	   taglist_filter.next()
+	   m.label:set_text(menu_taglist_text())
+	   for s = 1, screen.count() do
+		   tags[s][1].name = tags[s][1].name
+	   end
+   end },
    { menu_graph_text(), function (m)
        detailed_graphs.toggle()
        m.label:set_text(menu_graph_text())
@@ -575,7 +582,7 @@ mytasklist.buttons = awful.util.table.join(
 		awful.client.focus.byidx(-1)
 		if client.focus then client.focus:raise() end
 	end))
--- begin dashboard integration
+-- create dashboard_placeholder widget and add in background
 	dashboard_placeholder = wibox.widget.background()
 	dashboard_placeholder.fit = function()
 		if dashboard and not dashboard.minimized then
@@ -584,7 +591,7 @@ mytasklist.buttons = awful.util.table.join(
 		end
 		return 0,0
 	end
--- end dashboard integration
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
@@ -598,7 +605,7 @@ for s = 1, screen.count() do
 	awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
 	awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
     -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
+    mytaglist[s] = awful.widget.taglist(s, taglist_filter.call, mytaglist.buttons)
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
@@ -641,12 +648,12 @@ for s = 1, screen.count() do
             mymem,
             mylayoutbox[s] }
     })
--- begin dashboard integration
+-- give dashboard its own layout
 	layout = uzful.layout.build({
 		layout = wibox.layout.fixed.vertical,
 		dashboard_placeholder,
 		layout})
---end dashboard integration
+
     mywibox[s]:set_widget(layout)
 end
 -- }}}
@@ -676,6 +683,15 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
     awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
+	awful.key({ modkey, }, "a", function ()
+		if instance and instance.wibox.visible then
+			instance:hide()
+			instance = nil
+		else
+			instance = awful.menu.clients(nil,
+			{ keygrabber = true, theme = { width = 250 } } )
+		end
+	end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -750,7 +766,7 @@ clientkeys = awful.util.table.join(
 -- Compute the maximum number of digit we need, limited to 9
 keynumber = 0
 for s = 1, screen.count() do
-   keynumber = math.min(9, math.max(#tags[s], keynumber))
+   keynumber = math.min(12, math.max(#tags[s], keynumber))
 end
 
 -- Bind all key numbers to tags.
@@ -789,7 +805,7 @@ for i = 1, keynumber do
                   end))
 end
 
--- begin toggle dashboard
+-- make dashboard togglebar
 globalkeys = awful.util.table.join(globalkeys,
 	awful.key({}, "F12", function ()
 		if dashboard then
@@ -809,7 +825,6 @@ globalkeys = awful.util.table.join(globalkeys,
 		end
 	end)
 	)
--- end toggle dashboard
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
@@ -836,15 +851,18 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
+	  { rule = { class = "gvim" },
+	  properties = { size_hints_honor = false }},
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
 }
 -- }}}
 
+-- disable dashboard by default
 dashboard = nil
--- {{{ Signals
 
+-- {{{ Signals
 client.connect_signal("unmanage", function (c)
 	if c == dashboard then
 		local s = dashboard.screen
