@@ -99,6 +99,7 @@ end
 tags = {}
 tags_numbered = false
 tag_names = { "[1]", "[2]", "[3]", "[4]", "[5]", "[6]", "[7]", "[8]", "[9]", "[A]", "[B]", "[C]" }
+
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
     tags[s] = awful.tag(tag_names, s, layouts[3])
@@ -733,7 +734,7 @@ globalkeys = awful.util.table.join(
         -nf '" .. theme.fg_normal .. "' -sb '" .. theme.bg_normal .. "' \
         -sf '" .. theme.fg_focus .. "'") end),
     awful.key({ modkey }, "x", function()
-        awful.util.spawn_with_shell("execattach.sh")
+        awful.util.spawn_with_shell("/home/blastmaster/.bin/execattach.sh")
     end),
     awful.key({}, "XF86Launch1", function()
 		awful.util.spawn("xtrlock")
@@ -846,8 +847,6 @@ awful.rules.rules = {
                      keys = clientkeys,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
-      properties = { floating = true } },
-    { rule = { class = "pinentry" },
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
