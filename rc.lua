@@ -11,6 +11,8 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 --local lognotify = require("lognotify")
+local redshift = require("redshift")
+local keydoc = require("keydoc")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -48,6 +50,7 @@ vicious = require("vicious")
 uzful = require("uzful")
 require("uzful.restore")
 uzful.util.patch.vicious()
+--uzful.notification.patch()
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -57,6 +60,8 @@ editor_cmd = terminal .. " -e " .. editor
 menubar.cache_entries = true
 menubar.show_categories = true
 menubar.geometry.height = 14
+
+redshift.options = "~/.config/redshift.conf"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -133,11 +138,23 @@ local menu_taglist_text = function ()
     end
 end
 
+notify_suspended = false
+local menu_notify_text = function ()
+    return (notify_suspended and "enable" or "disable") .. "notifications"
+end
+
 -- {{{ Menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    {"wallpapers", uzful.menu.wallpaper.menu(theme.wallpapers)},
    { "manual", terminal .. " -e man awesome" },
+   { "test", function()
+       naughty.notify({
+           preset = naughty.config.presets.normal,
+           title = "footest",
+           text = "hello world!"
+       })
+   end },
    { menu_taglist_text(), function (m)
 	   taglist_filter.next()
 	   m.label:set_text(menu_taglist_text())
@@ -158,9 +175,19 @@ myawesomemenu = {
        end
        m.label:set_text(menu_tags_text())
    end },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", awesome.quit }
+   { "keybindings", keydoc.display },
+   { menu_notify_text(), function (m)
+        if notify_suspended then
+            naughty.resume()
+        else
+            naughty.suspend()
+        end
+        notify_suspended = not notify_suspended
+        m.label:set_text(menu_notify_text())
+    end },
+   { "toggle redshift", redshift.toggle() },
+   { "quit", awesome.quit },
+   { "restart", awesome.restart }
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
@@ -171,7 +198,16 @@ mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesom
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
 
+-- systray
+emptytray = drawin({})
+systray = wibox.widget.systray()
+container = wibox.layout.constraint()
+container:set_widget(systray)
+container:set_strategy("min")
+container:set_width(4)
+
 ---- Create a textclock widget
+local clockvisible = true
 mytextclock = awful.widget.textclock(' %H:%M ')
 mytextclock:set_font("sans 7")
 mycal = uzful.widget.calendar({ font = 7,
@@ -181,6 +217,12 @@ day = '<span color="#BBBBBB">$1</span>',
 number = '<span color="#EEEEEE">$1</span>',
 current = '<span color="green">$1</span>',
 })
+
+clockcontainer = wibox.layout.constraint()
+clockcontainer:set_widget(mytextclock)
+clockcontainer:set_strategy("min")
+-- flag to toggle systray and clock
+toggleflag = true
 --
 mytextclock:buttons(awful.util.table.join(
     awful.button({ }, 1, function() mycal:switch_month(-1) end),
@@ -194,7 +236,8 @@ mytextclock:buttons(awful.util.table.join(
     awful.button({ 'Shift' }, 4, function() mycal:switch_year(-1) end),
     awful.button({ 'Shift' }, 5, function() mycal:switch_year( 1) end)
 ))
---
+
+
 ---- Memory Progressbar
  mymem = uzful.widget.progressimage({
     x = 2, y = 2, width = 5, height = 10,
@@ -276,15 +319,15 @@ end).timer
 
 
 htimer = uzful.util.listen.sysfs({ subsystem = "drm", timer = htimer },
-                                 function (device, props)
-    if props.action == "change" and props.devtype == "drm_minor" and screen.count() > 1 then
-        naughty.notify({
-            timeout = 0,
-            hover_timeout = 0.1,
-            position = "bottom_right",
-            icon = theme.nomonitor })
-    end
-end).timer
+    function (device, props)
+        if props.action == "change" and props.devtype == "drm_minor" and screen.count() > 1 then
+            naughty.notify({
+                timeout = 0,
+                hover_timeout = 0.1,
+                position = "bottom_right",
+                icon = theme.nomonitor })
+        end
+    end).timer
 
 local mynotibat, mycritbat_old_val = nil, 0
 mycritbat = uzful.util.threshold(0.2,
@@ -528,8 +571,6 @@ mymem:connect_signal("mouse::leave", myinfobox.mem.hide)
 
 mylayoutmenu = uzful.menu.layouts(layouts, { align = "right", width = 80 })
 
-
-
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
@@ -629,21 +670,22 @@ for s = 1, screen.count() do
    --        end
    --    end)
    --end
+   --
+ 
 
     local layout = uzful.layout.build({
         layout = wibox.layout.align.horizontal,
         left = { layout = wibox.layout.fixed.horizontal,
-            --mylauncher,
             mytaglist[s],
             mypromptbox[s] },
         middle = mytasklist[s],
         right = { layout = wibox.layout.fixed.horizontal,
-            function () return s == SCREEN.LVDS1 and wibox.widget.systray() or nil end,
+            function () return s == SCREEN.LVDS1 and container or nil end,
             --mynotification[s].text,
             mynetgraphs.small.layout,
             mycpugraphs.small.layout,
             mytemp,
-            mytextclock,
+            clockcontainer,
             --mynet,
             mybat,
             mymem,
@@ -668,10 +710,11 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
+keydoc.group("Basic")
 globalkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
-    awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
-    awful.key({ modkey,           }, "Escape", awful.tag.history.restore        ),
+    awful.key({ modkey,           }, "Left",   awful.tag.viewprev, "Next Tag" ),
+    awful.key({ modkey,           }, "Right",  awful.tag.viewnext, "Previous Tag" ),
+    awful.key({ modkey,           }, "Escape", awful.tag.history.restore, "Toggle Tag" ),
 
     awful.key({ modkey,           }, "j",
         function ()
@@ -683,7 +726,7 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
+    awful.key({ modkey,           }, "w", function () mymainmenu:show() end, "Show Mainmenu"),
 	awful.key({ modkey, }, "a", function ()
 		if instance and instance.wibox.visible then
 			instance:hide()
@@ -692,65 +735,78 @@ globalkeys = awful.util.table.join(
 			instance = awful.menu.clients(nil,
 			{ keygrabber = true, theme = { width = 250 } } )
 		end
-	end),
+	end, "Show running Programms"),
 
     -- Layout manipulation
-    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
-    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
+    --keydoc.group("Layout")
+    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end, "Swap with Left"),
+    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end, "Swap with Right"),
     awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
     awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
-    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
+    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto, "Jump to urgent"),
     awful.key({ modkey,           }, "Tab",
         function ()
             awful.client.focus.history.previous()
             if client.focus then
                 client.focus:raise()
             end
-        end),
+        end, "Toggle Focus"),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey, "Control" }, "r", awesome.restart),
-    awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+    --keydoc.group("Standard Program")
+    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end, "human interface"),
+    awful.key({ modkey, "Control" }, "r", awesome.restart, "restart awesome"),
+    awful.key({ modkey, "Shift"   }, "q", awesome.quit, "quit awesome"),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
-    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
-    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
+    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end, "increment window"),
+    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end, "decrement window"),
+    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end, "increment master"),
+    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end, "decrement master"),
     awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
-    awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
+    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end, "Next Layout"),
+    awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end, "Previous Layout"),
 
-    awful.key({ modkey, "Control" }, "n", awful.client.restore),
-
-    -- Prompt
-    --awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey, "Control" }, "n", awful.client.restore, "restore window"),
 
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end),
+    awful.key({ modkey }, "p", function() menubar.show() end, "show menubar"),
     awful.key({ modkey }, "r", function()
         awful.util.spawn("dmenu_run -b -i -p 'Run:' -nb '" .. theme.bg_normal .. "' \
         -nf '" .. theme.fg_normal .. "' -sb '" .. theme.bg_normal .. "' \
-        -sf '" .. theme.fg_focus .. "'") end),
+        -sf '" .. theme.fg_focus .. "'") end, "run program"),
     awful.key({ modkey }, "x", function()
         awful.util.spawn_with_shell("/home/blastmaster/.bin/execattach.sh")
-    end),
+    end, "attach tmux session"),
     awful.key({}, "XF86Launch1", function()
 		awful.util.spawn("xtrlock")
         awful.util.spawn("xset dpms force off")
-        --awful.util.spawn_with_shell("lock")
+    end, "lock screen"),
+    awful.key({ modkey }, "c", function()
+        if toggleflag then
+            awesome.systray(emptytray, 0, 0, 10, true, "#000000")
+            container:set_widget(nil)
+            container:set_strategy("exact")
+            clockcontainer:set_widget(nil)
+            clockcontainer:set_strategy("exact")
+        else
+            container:set_strategy("min")
+            container:set_widget(systray)
+            clockcontainer:set_strategy("min")
+            clockcontainer:set_widget(mytextclock)
+        end
+            toggleflag = not toggleflag
     end)
 )
 
 clientkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
-    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
-    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
-    awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
-    awful.key({ modkey,           }, "s",      function (c) c.sticky = not c.sticky          end), --"toggle sticky"),
+    awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end, "fullscreen"),
+    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end, "close window"),
+    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle, "toggle floating"),
+    awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end, "swap master"),
+    awful.key({ modkey,           }, "o",      awful.client.movetoscreen, "move to screen"),
+    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end, "set window on top"),
+    awful.key({ modkey,           }, "s",      function (c) c.sticky = not c.sticky          end, "set window sticky"), 
     awful.key({ modkey,           }, "n",
         function (c)
             -- The client currently has the input focus, so it cannot be
@@ -761,7 +817,7 @@ clientkeys = awful.util.table.join(
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
-        end)
+        end, "minimize window")
 )
 
 -- Compute the maximum number of digit we need, limited to 9
@@ -791,19 +847,19 @@ for i = 1, keynumber do
                       if tags[screen][i] then
                           awful.tag.viewtoggle(tags[screen][i])
                       end
-                  end),
+                  end, "join tags"),
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           awful.client.movetotag(tags[client.focus.screen][i])
                       end
-                  end),
+                  end, "move window to tag"),
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus and tags[client.focus.screen][i] then
                           awful.client.toggletag(tags[client.focus.screen][i])
                       end
-                  end))
+                  end, "toggle tags"))
 end
 
 -- make dashboard togglebar
@@ -824,8 +880,9 @@ globalkeys = awful.util.table.join(globalkeys,
 			(dashboard.minimized and 0 or dashboard:geometry().height)
 			mywibox[s].draw()
 		end
-	end)
-	)
+	end, "sliding interface"),
+    awful.key({ modkey, "Shift" }, "F8", function () redshift.dim() end, "redshift dim" ),
+    awful.key({ modkey, "Shift" }, "F9", function () redshift.undim() end, "redshift undim"))
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
@@ -947,5 +1004,6 @@ end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+redshift.init(1)
 -- }}}
 require("autostart")
