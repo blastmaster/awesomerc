@@ -13,6 +13,7 @@ menubar = require("menubar")
 --local lognotify = require("lognotify")
 redshift = require("redshift")
 keydoc = require("keydoc")
+repl = require("uzful.widget.repl")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -637,7 +638,7 @@ mytasklist.buttons = awful.util.table.join(
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt()
+    mypromptbox[s] = awful.widget.prompt({prompt = "$ "})
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -776,11 +777,19 @@ globalkeys = awful.util.table.join(
         awful.util.spawn("dmenu_run -b -i -p 'Run:' -nb '" .. theme.bg_normal .. "' \
         -nf '" .. theme.fg_normal .. "' -sb '" .. theme.bg_normal .. "' \
         -sf '" .. theme.fg_focus .. "'") end, "run program"),
-    awful.key({ modkey }, "x", function()
-        awful.util.spawn_with_shell("/home/blastmaster/.bin/execattach.sh")
-    end, "attach tmux session"),
+    --awful.key({ modkey }, "x", function()
+        --awful.util.spawn_with_shell("/home/blastmaster/.bin/execattach.sh")
+    --end, "attach tmux session"),
+    awful.key({ modkey, "Shift" }, "x", function() repl.show(mouse.screen) end, "repl"),
+    awful.key({ modkey }, "x",
+        function()
+            awful.prompt.run({prompt = "> "},
+            mypromptbox[mouse.screen].widget,
+            awful.util.eval, nil,
+            awful.util.getdir("cache") .. "/history_eval")
+        end, "run lua"),
     awful.key({}, "XF86Launch1", function()
-		awful.util.spawn("xtrlock")
+        awful.util.spawn("xtrlock")
         awful.util.spawn("xset dpms force off")
     end, "lock screen"),
     awful.key({ modkey }, "c", function()
