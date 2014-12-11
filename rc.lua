@@ -59,7 +59,8 @@ editor_cmd = terminal .. " -e " .. editor
 
 menubar.cache_entries = true
 menubar.show_categories = true
-menubar.geometry.height = 14
+menubar.geometry.height = theme.menu_height
+menubar.geometry.height = theme.menu_height
 
 redshift.options = "~/.config/redshift.conf"
 
@@ -71,7 +72,7 @@ redshift.options = "~/.config/redshift.conf"
 modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
-local layouts =
+awful.layout.layouts =
 {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
@@ -107,7 +108,7 @@ tag_names = { "[1]", "[2]", "[3]", "[4]", "[5]", "[6]", "[7]", "[8]", "[9]", "[A
 
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag(tag_names, s, layouts[3])
+    tags[s] = awful.tag(tag_names, s, awful.layout.layouts[3])
 end
 -- }}}
 
@@ -569,7 +570,7 @@ mymem:connect_signal("mouse::leave", myinfobox.mem.hide)
 ----end
 --
 
-mylayoutmenu = uzful.menu.layouts(layouts, { align = "right", width = 80 })
+mylayoutmenu = uzful.menu.layouts(awful.layout.layouts, { align = "right", width = 80 })
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
@@ -613,7 +614,7 @@ mytasklist.buttons = awful.util.table.join(
 			instance:hide()
 			instance = nil
 		else
-			instance = awful.menu.clients(nil,{theme={ width=250 }})
+			instance = awful.menu.clients({theme={ width=250 }})
 		end
 	end),
 	awful.button({ }, 4, function ()
@@ -641,11 +642,11 @@ for s = 1, screen.count() do
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
     mylayoutbox[s]:buttons(awful.util.table.join(
-	awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
+	awful.button({ }, 1, function () awful.layout.inc(1) end),
 	awful.button({ }, 2, function () mylayoutmenu:toggle() end),
-	awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
-	awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
-	awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
+	awful.button({ }, 3, function () awful.layout.inc(-1) end),
+	awful.button({ }, 4, function () awful.layout.inc(1) end),
+	awful.button({ }, 5, function () awful.layout.inc(-1) end)))
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, taglist_filter.call, mytaglist.buttons)
 
@@ -929,7 +930,7 @@ client.connect_signal("unmanage", function (c)
 end)
 
 -- Signal function to execute when a new client appears.
-client.connect_signal("manage", function (c, startup)
+client.connect_signal("manage", function (c)
     --c.opacity = 1
     -- Enable sloppy focus
     c:connect_signal("mouse::enter", function(c)
@@ -951,7 +952,7 @@ client.connect_signal("manage", function (c, startup)
 		c:geometry({y = c:geometry().y - theme.menu_height, height = 300 })
 	end
 
-    if not startup then
+    if not awesome.startup then
         -- Set the windows at the slave,
         -- i.e. put it at the end of others instead of setting it master.
         -- awful.client.setslave(c)
