@@ -1,18 +1,18 @@
 -- Standard awesome library
-local gears = require("gears")
-local awful = require("awful")
+gears = require("gears")
+awful = require("awful")
 awful.rules = require("awful.rules")
 require("awful.autofocus")
 -- Widget and layout library
-local wibox = require("wibox")
+wibox = require("wibox")
 -- Theme handling library
-local beautiful = require("beautiful")
+beautiful = require("beautiful")
 -- Notification library
-local naughty = require("naughty")
-local menubar = require("menubar")
+naughty = require("naughty")
+menubar = require("menubar")
 --local lognotify = require("lognotify")
-local redshift = require("redshift")
-local keydoc = require("keydoc")
+redshift = require("redshift")
+keydoc = require("keydoc")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
