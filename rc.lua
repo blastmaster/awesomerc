@@ -116,6 +116,16 @@ end
 --myrestorelist = uzful.restore(layouts)
 
 --{{{
+
+awful.menu.menu_keys = {
+    up = { "k" },
+    down = { "j" },
+    back = { "h" },
+    enter = { "l" },
+    exec = { "Return" },
+    close = { "Escape" }
+}
+
 detailed_graphs = uzful.menu.toggle_widgets()
 
 taglist_filter = uzful.util.functionlist({
