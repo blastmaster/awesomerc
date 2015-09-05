@@ -10,6 +10,7 @@ theme = {}
 local dir = awful.util.getdir("config") .. "/theme/"
 
 theme.font          = "sans 7"
+theme.widget_font   = "ProggyTinyTT"
 
 theme.bg_normal     = "#000000"
 theme.bg_focus      = "#000000"
