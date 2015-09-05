@@ -14,6 +14,7 @@ menubar = require("menubar")
 redshift = require("redshift")
 keydoc = require("keydoc")
 repl = require("uzful.widget.repl")
+utilz = require("utilz")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -138,13 +139,14 @@ taglist_filter = uzful.util.functionlist({
 myawesomemenu = {
    {"wallpapers", uzful.menu.wallpaper.menu(theme.wallpapers)},
    { "manual", terminal .. " -e man awesome" },
-   { "test", function()
-       naughty.notify({
-           preset = naughty.config.presets.normal,
-           title = "footest",
-           text = "hello world!"
-       })
-   end },
+   --{ "test", function()
+       --naughty.notify({
+           --preset = naughty.config.presets.normal,
+           --title = "footest",
+           --text = "hello world!"
+       --})
+       --return true
+   --end },
       uzful.menu.switch.filter({
        filter = taglist_filter,
        labels = {
@@ -221,14 +223,6 @@ if rc.conf.clock and rc.conf.calendar then
         awful.button({ 'Shift' }, 5, function() mycal:switch_year( 1) end)
     ))
 end
-
---clockcontainer = wibox.layout.constraint()
---clockcontainer:set_widget(mytextclock)
---clockcontainer:set_strategy("min")
----- flag to toggle systray and clock
---toggleflag = true
---
-
 
 ---- Memory Progressbar
 mymem = nil
@@ -447,7 +441,6 @@ mylayoutmenu = uzful.menu.layouts(awful.layout.layouts, { align = "right", width
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
-
 
 -- Create a wibox for each screen and add it
 mywibox = {}
