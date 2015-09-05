@@ -1,9 +1,9 @@
-[submodule "vicious"]
-	path = vicious
-	url = git@github.com:Mic92/vicious.git
 [submodule "uzful"]
 	path = uzful
 	url = git@github.com:dodo/uzful.git
 [submodule "lognotify"]
 	path = lognotify
 	url = git://github.com/Mic92/lognotify.git
+[submodule "awesome-redshift"]
+	path = awesome-redshift
+	url = git@github.com:blastmaster/awesome-redshift.git
