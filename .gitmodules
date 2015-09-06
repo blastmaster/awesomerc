@@ -1,3 +1,6 @@
+[submodule "vicious"]
+	path = vicious
+	url = https://github.com/Mic92/vicious.git
 [submodule "uzful"]
 	path = uzful
 	url = git@github.com:dodo/uzful.git
