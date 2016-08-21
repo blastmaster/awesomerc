@@ -210,8 +210,12 @@ batwidget = lain.widgets.bat({
   notify = "off",
   settings = function()
     remainingtime = bat_now.time
-    if bat_now.status == "Charging" or bat_now.status == "Full" then
+    if bat_now.status == "Full" then
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
+    elseif bat_now.status == "N/A" or bat_now.status == "Unknown" then
+      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
+    elseif bat_now.status == "Charging" then
+      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
     elseif tonumber(bat_now.perc) > 60 then
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
     elseif tonumber(bat_now.perc) > 20 then
