@@ -9,7 +9,6 @@ theme = {}
 
 local dir = awful.util.getdir("config") .. "/theme/"
 
---theme.widget_font   = "ProggyTinyTT"
 theme.font          = "FontAwesome 8"
 theme.widget_font   = "ProggyTinyTT"
 theme.iconFont      = "FontAwesome"
@@ -36,7 +35,6 @@ theme.bg_systray    = theme.bg_normal
 theme.bg_tagbar     = "#212121"
 
 theme.fg_normal     = theme.color_lightblue
---theme.fg_focus      = theme.color_lightgreen
 theme.fg_focus      = theme.color_orange
 theme.fg_urgent     = theme.color_red
 theme.fg_minimize   = theme.color_white
@@ -137,26 +135,26 @@ idx = math.random(1, table.getn(theme.wallpapers))
 theme.wallpaper = theme.wallpapers[idx][1]
 
 -- You can use your own layout icons like this:
-theme.layout_fairh = dir .. "layouts/fairho.png"
-theme.layout_fairv = dir .. "layouts/fairvo.png"
-theme.layout_floating  = dir .. "layouts/floatingo.png"
-theme.layout_magnifier = dir .. "layouts/magnifiero.png"
-theme.layout_max = dir .. "layouts/maxo.png"
-theme.layout_fullscreen = dir .. "layouts/fullscreeno.png"
-theme.layout_tilebottom = dir .. "layouts/tilebottomo.png"
-theme.layout_tileleft   = dir .. "layouts/tilelefto.png"
-theme.layout_tile = dir .. "layouts/tileo.png"
-theme.layout_tiletop = dir .. "layouts/tiletopo.png"
-theme.layout_spiral  = dir .. "layouts/spiralo.png"
-theme.layout_dwindle = dir .. "layouts/dwindleo.png"
+theme.layout_fairh = dir .. "layouts/fairh.png"
+theme.layout_fairv = dir .. "layouts/fairv.png"
+theme.layout_floating  = dir .. "layouts/floating.png"
+theme.layout_magnifier = dir .. "layouts/magnifier.png"
+theme.layout_max = dir .. "layouts/max.png"
+theme.layout_fullscreen = dir .. "layouts/fullscreen.png"
+theme.layout_tilebottom = dir .. "layouts/tilebottom.png"
+theme.layout_tileleft   = dir .. "layouts/tileleft.png"
+theme.layout_tile = dir .. "layouts/tile.png"
+theme.layout_tiletop = dir .. "layouts/tiletop.png"
+theme.layout_spiral  = dir .. "layouts/spiral.png"
+theme.layout_dwindle = dir .. "layouts/dwindle.png"
 
 theme.awesome_icon = "/usr/local/share/awesome/icons/awesome16.png"
 
-theme.memory = dir .. "memory.png"
-theme.battery = dir .. "battery.png"
-theme.nobattery = dir .. "nobattery.png"
-theme.dock = dir .. "dock.png"
-theme.nomonitor = dir .. "nomonitor.png"
+--theme.memory = dir .. "memory.png"
+--theme.battery = dir .. "battery.png"
+--theme.nobattery = dir .. "nobattery.png"
+--theme.dock = dir .. "dock.png"
+--theme.nomonitor = dir .. "nomonitor.png"
 
 -- Define the icon theme for application icons. If not set then the icons 
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
