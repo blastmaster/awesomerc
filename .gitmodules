@@ -10,3 +10,6 @@
 [submodule "awesome-redshift"]
 	path = awesome-redshift
 	url = git@github.com:blastmaster/awesome-redshift.git
+[submodule "lain"]
+	path = lain
+	url = https://github.com/copycat-killer/lain.git
