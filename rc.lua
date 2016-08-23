@@ -8,8 +8,6 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
-local menubar = require("menubar")
-local hotkeys_popup = require("awful.hotkeys_popup").widget
 local lain = require("lain")
 
 -- {{{ Error handling
@@ -83,30 +81,14 @@ local function client_menu_toggle_fn()
 end
 -- }}}
 
-local mymainmenu = require("rc.menu")
+-- Menu
+mymainmenu = require("rc.menu")
 
--- {{{ Menu
--- Create a launcher widget and a main menu
-myawesomemenu = {
-   --{ "hotkeys", function() return false, hotkeys_popup.show_help end},
-   { "manual", terminal .. " -e man awesome" },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", awesome.quit }
-}
-
--- Menubar configuration
-menubar.utils.terminal = terminal -- Set the terminal for applications that require it
--- }}}
-
--- Keyboard map indicator and switcher
---mykeyboardlayout = awful.widget.keyboardlayout()
 
 -- {{{ Wibox
 
 -- Create a wibox for each screen and add it
 mywibox = {}
-mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
 mytaglist.buttons = awful.util.table.join(
@@ -293,8 +275,6 @@ awful.screen.connect_for_each_screen(function(s)
     --          1     2    3    4    5    6    7    8    9    10   11  12
     awful.tag({ "", "", "", "", "", "", "", "", "", "", "", ""  }, s, awful.layout.layouts[3])
 
-    -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -318,8 +298,6 @@ awful.screen.connect_for_each_screen(function(s)
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
             mytaglist[s],
-            -- todo remove prompt before, enable dmenu
-            mypromptbox[s],
         },
         mytasklist[s], -- Middle widget
         { -- Right widgets

@@ -1,5 +1,8 @@
 local awful = require("awful")
+local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
+
+menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 
 return {
     globalkeys = awful.util.table.join(
@@ -24,8 +27,8 @@ return {
             end,
             {description = "focus previous by index", group = "client"}
         ),
-        --awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
-                --{description = "show main menu", group = "awesome"}),
+        awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
+                {description = "show main menu", group = "awesome"}),
 
         -- Layout manipulation
         awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
@@ -72,6 +75,16 @@ return {
         awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
                 {description = "select previous", group = "layout"}),
 
+        awful.key({ modkey, }, "a", function ()
+            if instance and instance.wibox.visible then
+                instance:hide()
+                instance = nil
+            else
+                instance = awful.menu.clients(nil,
+                { keygrabber = true, theme = { width = 250 } } )
+            end
+        end, {description = "Show running Programms", group = "awesome"}),
+
         awful.key({ modkey, "Control" }, "n",
                 function ()
                     local c = awful.client.restore()
@@ -83,9 +96,16 @@ return {
                 end,
                 {description = "restore minimized", group = "client"}),
 
+        awful.key({}, "XF86Launch1", function()
+            awful.util.spawn("xtrlock")
+            awful.util.spawn("xset dpms force off")
+        end, {description = "lock screen", group = "client"}),
+
         -- Prompt
-        awful.key({ modkey },            "r",     function () mypromptbox[awful.screen.focused()]:run() end,
-                {description = "run prompt", group = "launcher"}),
+        awful.key({ modkey }, "r", function()
+            awful.util.spawn("dmenu_run -b -i -p 'Run:' -nb '" .. theme.bg_normal .. "' \
+            -nf '" .. theme.fg_normal .. "' -sb '" .. theme.bg_normal .. "' \
+            -sf '" .. theme.fg_focus .. "'") end, {description = "run program", group = "launcher"}),
 
         awful.key({ modkey }, "x",
                 function ()
