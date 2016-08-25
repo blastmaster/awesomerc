@@ -6,8 +6,6 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 return {
     globalkeys = awful.util.table.join(
-        awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
-                {description="show help", group="awesome"}),
         awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
                 {description = "view previous", group = "tag"}),
         awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
@@ -137,6 +135,8 @@ return {
                 {description = "move to screen", group = "client"}),
         awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
                 {description = "toggle keep on top", group = "client"}),
+        awful.key({ modkey,           }, "s",      function (c) c.sticky = not c.sticky          end,
+         {description = "set window sticky", group = "client"}),
         awful.key({ modkey,           }, "n",
             function (c)
                 -- The client currently has the input focus, so it cannot be
