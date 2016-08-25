@@ -200,7 +200,7 @@ batwidget = lain.widgets.bat({
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
     elseif tonumber(bat_now.perc) > 60 then
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    elseif tonumber(bat_now.perc) > 20 then
+    elseif tonumber(bat_now.perc) > 10 then
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
     else
       widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_batlow_fg .. '"> </span> <span color="' .. beautiful.widget_batlow_fg .. '">' .. bat_now.perc .. '%</span>')
