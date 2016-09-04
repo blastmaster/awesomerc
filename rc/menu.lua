@@ -1,9 +1,10 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-
+-- hotkeys does not work
+--local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 local myawesomemenu = {
-    { "hotkeys", function() return false, hotkeys_popup.show_help end},
+    --{ "hotkeys", function() return false, hotkeys_popup.show_help end},
     { "manual", terminal .. " -e man awesome" },
     { "edit config", editor_cmd .. " " .. awesome.conffile },
     { "restart", awesome.restart },
