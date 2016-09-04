@@ -84,7 +84,6 @@ end
 -- Menu
 mymainmenu = require("rc.menu")
 
-
 -- {{{ Wibox
 
 -- Create a wibox for each screen and add it
@@ -136,127 +135,21 @@ mytasklist.buttons = awful.util.table.join(
 
 -- Widgets
 
-
 -- {{{ CPU usage
-cpuwidget = lain.widgets.sysload({
-  timeout = 5,
-  settings = function()
-    widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_cpu_fg_icon .. '"> </span> <span color="' .. beautiful.widget_cpu_fg .. '">' .. load_1 .. '</span>')
-  end
-})
-
-cpuwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn(terminal .. " -e htop") end)))
-
-local cpunotification
-cpuwidget:connect_signal("mouse::enter", function()
-  local cpuusage
-  lain.widgets.cpu({
-    settings = function()
-      cpuusage = cpu_now.usage
-    end
-  })
-
-  local ramtotal
-  local ramusage
-  local swaptotal
-  local swapusage
-  lain.widgets.mem({
-    settings = function()
-      ramusage = mem_now.used
-      ramtotal = mem_now.total
-      swapusage = mem_now.swapused
-      swaptotal = mem_now.swapf
-    end
-  })
-  cpunotification = naughty.notify({
-    text = "CPU: " .. cpuusage .. "%\nRAM: " .. ramusage .. "/" .. ramtotal .. " MB\nSWAP: " .. swapusage .. "/" .. swaptotal .. " MB",
-    position = "top_right",
-    timeout = 0,
-    fg = beautiful.color_white
-  })
-end)
-cpuwidget:connect_signal("mouse::leave", function()
-  if (cpunotification ~= nil) then
-    naughty.destroy(cpunotification)
-    cpunotification = nil
-  end
-end)
-
--- }}}
+cpuwidget = require("rc.widget").cpu_widget
 
 -- {{{ Battery state
-local remainingtime
-batwidget = lain.widgets.bat({
-  timeout = 60,
-  battery = "BAT0",
-  notify = "off",
-  settings = function()
-    remainingtime = bat_now.time
-    if bat_now.status == "Full" then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    elseif bat_now.status == "N/A" or bat_now.status == "Unknown" then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    elseif bat_now.status == "Charging" then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    elseif tonumber(bat_now.perc) > 60 then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    elseif tonumber(bat_now.perc) > 10 then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_bat_fg .. '"> </span> <span color="' .. beautiful.widget_bat_fg .. '">' .. bat_now.perc .. '%</span>')
-    else
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_batlow_fg .. '"> </span> <span color="' .. beautiful.widget_batlow_fg .. '">' .. bat_now.perc .. '%</span>')
-    end
-  end
-})
-local batnotification
-batwidget:connect_signal("mouse::enter", function()
-  batnotification = naughty.notify({
-    text = "Remaining time: " .. remainingtime,
-    position = "top_right",
-    timeout = 0,
-    fg = beautiful.color_white
-  })
-end)
-batwidget:connect_signal("mouse::leave", function()
-  if (batnotification ~= nil) then
-    naughty.destroy(batnotification)
-    batnotification = nil
-  end
-end)
+batwidget = require("rc.widget").battery_widget
 
 -- {{{ Volume information
-volwidget = lain.widgets.alsa({
-  timeout = 2,
-  channel = "Master",
-  settings = function()
-    if volume_now.status == "off" or volume_now.level == "0" then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_vol_fg_icon .. '"> </span> <span color="' .. beautiful.widget_vol_fg .. '"></span>')
-    elseif tonumber(volume_now.level) > 70 then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_vol_fg_icon .. '"> </span> <span color="' .. beautiful.widget_vol_fg .. '">' .. volume_now.level .. '</span>')
-    elseif tonumber(volume_now.level) > 40 then
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_vol_fg_icon .. '"> </span> <span color="' .. beautiful.widget_vol_fg .. '">' .. volume_now.level .. '</span>')
-    else
-      widget:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_vol_fg_icon .. '"> </span> <span color="' .. beautiful.widget_vol_fg .. '">' .. volume_now.level .. '</span>')
-    end
-  end
-})
-
--- TODO
-volwidget:buttons(awful.util.table.join(
-     awful.button({}, 1,
-     function() awful.util.spawn_with_shell(terminal .. " -e alsamixer") end),
-     awful.button({ }, 3,
-     function() awful.util.spawn_with_shell("amixer -q set Master toggle") end),
-     awful.button({ }, 4,
-     function() awful.util.spawn_with_shell("amixer -q set Master 5%+ unmute") end),
-     awful.button({ }, 5,
-     function() awful.util.spawn_with_shell("amixer -q set Master 5%- unmute") end)
-))
+volwidget = require("rc.widget").volume_widget
 
 -- {{{ Date and time
 dateicon = wibox.widget.textbox()
 dateicon:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_date_fg_icon .. '"> </span> ')
-datewidget = wibox.widget.textclock('<span color="' .. beautiful.color_white .. '">%R</span> ')
-lain.widgets.calendar:attach(datewidget, { icons = '', font = beautiful.font, font_size = 8, fg = beautiful.widget_date_fg})
+
+datewidget = require("rc.widget").date_widget
+
 
 -- }}}
 
