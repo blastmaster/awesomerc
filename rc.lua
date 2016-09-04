@@ -8,7 +8,6 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
-local lain = require("lain")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -150,6 +149,8 @@ dateicon:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beaut
 
 datewidget = require("rc.widget").date_widget
 
+-- laod tag desciption, containing names and layouts
+tagdesc = require("rc.tags")
 
 -- }}}
 
@@ -165,8 +166,7 @@ awful.screen.connect_for_each_screen(function(s)
     end
 
     -- Each screen has its own tag table.
-    --          1     2    3    4    5    6    7    8    9    10   11  12
-    awful.tag({ "", "", "", "", "", "", "", "", "", "", "", ""  }, s, awful.layout.layouts[3])
+    awful.tag(tagdesc.names, s, tagdesc.layouts)
 
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
