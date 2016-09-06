@@ -4,7 +4,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 
-local keybindings = { globalkeys = {}, clientkeys = {} }
+local keybindings = { globalkeys = {}, clientkeys = {}, clientbuttons = {} }
 
 
 keybindings.globalkeys = awful.util.table.join(
@@ -169,6 +169,12 @@ for i = 1, 12 do
                 {description = "toggle focused client on tag #" .. i, group = "tag"})
     )
 end
+
+-- Define clientbuttons
+keybindings.clientbuttons = awful.util.table.join(
+    awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
+    awful.button({ modkey }, 1, awful.mouse.client.move),
+    awful.button({ modkey }, 3, awful.mouse.client.resize))
 
 -- Define clientkeys
 keybindings.clientkeys = awful.util.table.join(
