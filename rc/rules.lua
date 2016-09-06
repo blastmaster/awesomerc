@@ -32,6 +32,7 @@ return {
           "Wpa_gui",
           "pinentry",
           "veromix",
+          "Gimp",
           "xtightvncviewer"},
 
         name = {
@@ -48,6 +49,15 @@ return {
       }, properties = { titlebars_enabled = false}
     },
 
+    --FIXME: tag must be icon, additional name would be better
+    { rule = { class = "chromium"},
+        properties = { screen = 1, tag = "" } },
+    { rule = { class = "Gajim" },
+        properties = { screen = 1, tag = "" } },
+    { rule = { class = "Evince" },
+        properties = { screen =  1, tag = "" } },
+    { rule = { class = "Okular" },
+        properties = { screen = 1, tag = "" } },
     -- Set Firefox to always map on the tag named "2" on screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { screen = 1, tag = "2" } },
