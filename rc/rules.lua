@@ -12,7 +12,7 @@ return {
                      focus = awful.client.focus.filter,
                      raise = true,
                      keys = keys.clientkeys,
-                     buttons = clientbuttons,
+                     buttons = keys.clientbuttons,
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen
      }
     },
@@ -46,10 +46,12 @@ return {
 
     -- Add !NOT! titlebars to normal clients and dialogs
     { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = false}
+      }, properties = { titlebars_enabled = true}
     },
 
     --FIXME: tag must be icon, additional name would be better
+    { rule = { class = "icedove"},
+        properties = { screen = 1, tag = "" } },
     { rule = { class = "chromium"},
         properties = { screen = 1, tag = "" } },
     { rule = { class = "Gajim" },

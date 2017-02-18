@@ -1,13 +1,15 @@
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
-require("awful.autofocus")
+              require("awful.autofocus")
 -- Widget and layout library
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
+-- freedesktop support
+local freedesktop = require("freedesktop")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -37,11 +39,10 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 --beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
-beautiful.init("~/.config/awesome/theme.lua")
-
 -- This is used later as the default terminal and editor to run.
 terminal = "konsole"
 editor = os.getenv("EDITOR") or "vim"
+gui_editor = "gvim"
 editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
@@ -50,6 +51,9 @@ editor_cmd = terminal .. " -e " .. editor
 -- I suggest you to remap Mod4 to another key using xmodmap or other tools.
 -- However, you can use another modifier like Mod1, but it may interact with others.
 modkey = "Mod4"
+altkey = "Mod1"
+
+awful.util.terminal = terminal
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
@@ -65,39 +69,77 @@ awful.layout.layouts = {
 }
 -- }}}
 
+awful.util.tagnames = require("rc.tags").names
+
+beautiful.init("~/.config/awesomerc/theme.lua")
+
 -- Menu
-mymainmenu = require("rc.menu")
+awful.util.mymainmenu = require("rc.menu")
 
--- {{{ Wibox
 
--- Create a wibox for each screen and add it
-mywibox = {}
-mylayoutbox = {}
-mytaglist = require("rc.taglist")
-mytasklist = require("rc.tasklist")
--- Widgets
+-- Define buttons for taglist.
+awful.util.taglist_buttons = awful.util.table.join(
+                    awful.button({ }, 1, function(t) t:view_only() end),
+                    awful.button({ modkey }, 1, function(t)
+                                              if client.focus then
+                                                  client.focus:move_to_tag(t)
+                                              end
+                                          end),
+                    awful.button({ }, 3, awful.tag.viewtoggle),
+                    awful.button({ modkey }, 3, function(t)
+                                              if client.focus then
+                                                  client.focus:toggle_tag(t)
+                                              end
+                                          end),
+                    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
+                    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
+                )
 
--- {{{ CPU usage
-cpuwidget = require("rc.widget").cpu_widget
+-- {{{ Helper functions
+local function client_menu_toggle_fn()
+    local instance = nil
 
--- {{{ Battery state
-batwidget = require("rc.widget").battery_widget
-
--- {{{ Volume information
-volwidget = require("rc.widget").volume_widget
-
--- {{{ Date and time
-dateicon = wibox.widget.textbox()
-dateicon:set_markup('<span font="' .. beautiful.iconFont .. '" color="' .. beautiful.widget_date_fg_icon .. '"> </span> ')
-
-datewidget = require("rc.widget").date_widget
-
--- laod tag desciption, containing names and layouts
-tagdesc = require("rc.tags")
-
+    return function ()
+        if instance and instance.wibox.visible then
+            instance:hide()
+            instance = nil
+        else
+            instance = awful.menu.clients({ theme = { width = 250 } })
+        end
+    end
+end
 -- }}}
 
-awful.screen.connect_for_each_screen(function(s)
+-- Define tasklist buttons
+awful.util.tasklist_buttons = awful.util.table.join(
+                     awful.button({ }, 1, function (c)
+                                              if c == client.focus then
+                                                  c.minimized = true
+                                              else
+                                                  -- Without this, the following
+                                                  -- :isvisible() makes no sense
+                                                  c.minimized = false
+                                                  if not c:isvisible() and c.first_tag then
+                                                      c.first_tag:view_only()
+                                                  end
+                                                  -- This will also un-minimize
+                                                  -- the client, if needed
+                                                  client.focus = c
+                                                  c:raise()
+                                              end
+                                          end),
+                     awful.button({ }, 3, client_menu_toggle_fn()),
+                     awful.button({ }, 4, function ()
+                                              awful.client.focus.byidx(1)
+                                          end),
+                     awful.button({ }, 5, function ()
+                                              awful.client.focus.byidx(-1)
+                                          end)
+                )
+
+
+
+screen.connect_signal("property::geometry", function(s)
     -- Wallpaper
     if beautiful.wallpaper then
         local wallpaper = beautiful.wallpaper
@@ -107,59 +149,18 @@ awful.screen.connect_for_each_screen(function(s)
         end
         gears.wallpaper.maximized(wallpaper, s, true)
     end
-
-    -- Each screen has its own tag table.
-    awful.tag(tagdesc.names, s, tagdesc.layouts)
-
-    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
-    mylayoutbox[s] = awful.widget.layoutbox(s)
-    mylayoutbox[s]:buttons(awful.util.table.join(
-                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
-                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
-    -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
-
-    -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons, beautiful.tasklist_theme)
-
-    -- Create the wibox
-    mywibox[s] = awful.wibar({ position = "top", screen = s, bg = beautiful.bg_tagbar })
-
-    -- Add widgets to the wibox
-    mywibox[s]:setup {
-        layout = wibox.layout.align.horizontal,
-        { -- Left widgets
-            layout = wibox.layout.fixed.horizontal,
-            mytaglist[s],
-        },
-        mytasklist[s], -- Middle widget
-        { -- Right widgets
-            layout = wibox.layout.fixed.horizontal,
-            --mykeyboardlayout,
-            wibox.widget.systray(),
-            volwidget,
-            cpuwidget,
-            batwidget,
-            dateicon,
-            datewidget,
-            mylayoutbox[s],
-        },
-    }
 end)
--- }}}
+
+awful.screen.connect_for_each_screen(function (s) beautiful.at_screen_connect(s) end)
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({ }, 3, function () mymainmenu:toggle() end),
+    awful.button({ }, 3, function () awful.util.mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
 globalkeys = require("rc.keybindings")
-
 -- Set keys
 root.keys(globalkeys.globalkeys)
 -- }}}
@@ -197,7 +198,7 @@ client.connect_signal("request::titlebars", function(c)
         end)
     )
 
-    awful.titlebar(c) : setup {
+    awful.titlebar(c, {size = 16}) : setup {
         { -- Left
             awful.titlebar.widget.iconwidget(c),
             buttons = buttons,
@@ -231,6 +232,16 @@ client.connect_signal("mouse::enter", function(c)
     end
 end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+-- No border for maximized clients
+client.connect_signal("focus",
+    function(c)
+        if c.maximized then
+            c.border_width = 0
+        elseif #awful.screen.focused().clients > 1 then
+            c.border_width = beautiful.border_width
+            c.border_color = beautiful.border_focus
+        end
+    end)
+
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
