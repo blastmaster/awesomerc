@@ -5,7 +5,7 @@ local beautiful = require("beautiful")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local lain = require("lain")
 
-menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+--menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 
 local keybindings = { globalkeys = {}, clientkeys = {}, clientbuttons = {} }
 

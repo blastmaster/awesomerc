@@ -1,6 +1,6 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-local keys = require("rc.keybindings")
+local keys = require("conf.keybindings")
 
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
