@@ -191,7 +191,7 @@ keybindings.globalkeys = awful.util.table.join(
     ),
 
     -- Dropdown application
-    awful.key({ modkey, }, "z",
+    awful.key({ modkey, }, "F1",
         function()
             awful.screen.focused().quake:toggle()
         end,

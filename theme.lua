@@ -322,7 +322,9 @@ end)))
 
 function theme.at_screen_connect(s)
     -- Quake application
-    --s.quake = lain.util.quake({ app = awful.util.terminal })
+    s.quake = lain.util.quake({app = awful.util.terminal,
+                               extra = "-e start_tmux.sh",
+                               height = 0.45})
 
     -- If wallpaper is a function, call it with screen
     if type(wallpaper) == "function" then
