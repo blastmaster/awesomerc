@@ -276,10 +276,6 @@ theme.weather = lain.widget.weather({
 
 -- MPD
 local mpd_icon = awful.widget.launcher({ image = theme.mpdl, command = theme.musicplr })
-local prev_icon = wibox.widget.imagebox(theme.prev)
-local next_icon = wibox.widget.imagebox(theme.nex)
-local stop_icon = wibox.widget.imagebox(theme.stop)
-local pause_icon = wibox.widget.imagebox(theme.pause)
 local play_pause_icon = wibox.widget.imagebox(theme.play)
 theme.mpd = lain.widget.mpd({
     settings = function ()
@@ -296,28 +292,13 @@ local musicbg = wibox.container.background(theme.mpd.widget, theme.bg_focus, gea
 local musicwidget = wibox.container.margin(musicbg, 0, 0, 5, 5)
 
 musicwidget:buttons(awful.util.table.join(awful.button({ }, 1,
-function () awful.spawn(theme.musicplr) end)))
-prev_icon:buttons(awful.util.table.join(awful.button({}, 1,
-function ()
-    awful.spawn.with_shell("mpc prev")
-    theme.mpd.update()
-end)))
-next_icon:buttons(awful.util.table.join(awful.button({}, 1,
-function ()
-    awful.spawn.with_shell("mpc next")
-    theme.mpd.update()
-end)))
-stop_icon:buttons(awful.util.table.join(awful.button({}, 1,
-function ()
-    play_pause_icon:set_image(theme.play)
-    awful.spawn.with_shell("mpc stop")
-    theme.mpd.update()
-end)))
+                    function () awful.spawn(theme.musicplr) end)))
+
 play_pause_icon:buttons(awful.util.table.join(awful.button({}, 1,
-function ()
-    awful.spawn.with_shell("mpc toggle")
-    theme.mpd.update()
-end)))
+                        function ()
+                            awful.spawn.with_shell("mpc toggle")
+                            theme.mpd.update()
+                        end)))
 
 
 function theme.at_screen_connect(s)

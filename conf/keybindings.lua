@@ -288,20 +288,6 @@ keybindings.globalkeys = awful.util.table.join(
         end,
         {description = "Play next", group = "mpd"}
     ),
-    awful.key({ altkey, }, "0",
-        function ()
-            local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
-            if beautiful.mpd.timer.started then
-                beautiful.mpd.timer:stop()
-                common.text = common.text .. lain.util.markup.bold("OFF")
-            else
-                beautiful.mpd.timer:start()
-                common.text = common.text .. lain.util.markup.bold("ON")
-            end
-            naughty.notify(common)
-        end,
-        {description = "Toggle mpd widget on/off", group = "mpd"}
-    ),
 
     -- Copy primary to clipboard (terminals to gtk)
     awful.key({ modkey, }, "c",
@@ -341,9 +327,6 @@ keybindings.globalkeys = awful.util.table.join(
                 --awful.util.get_cache_dir() .. "/history_eval")
             --end,
             --{description = "lua execute prompt", group = "awesome"}),
-    -- Menubar
-    --awful.key({ modkey }, "p", function() menubar.show() end,
-            --{description = "show the menubar", group = "launcher"})
 )
 
 -- Bind all key numbers to tags.
