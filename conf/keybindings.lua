@@ -1,11 +1,8 @@
 local awful = require("awful")
 local naughty = require("naughty")
---local menubar = require("menubar")
 local beautiful = require("beautiful")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local lain = require("lain")
-
---menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 
 local keybindings = { globalkeys = {}, clientkeys = {}, clientbuttons = {} }
 
@@ -17,18 +14,19 @@ keybindings.globalkeys = awful.util.table.join(
               {description = "show help", group = "awesome"}),
 
     -- Tag browsing
-    awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
-            {description = "view previous", group = "tag"}),
-    awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
-            {description = "view next", group = "tag"}),
+    --awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
+            --{description = "view previous", group = "tag"}),
+    --awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
+            --{description = "view next", group = "tag"}),
+    -- Non-empty tag browsing (Not Default)
+    awful.key({ modkey }, "Left", function() lain.util.tag_view_nonempty(-1) end,
+              {description = "view previous nonempty", group = "tag"}),
+    awful.key({ modkey }, "Right", function() lain.util.tag_view_nonempty(1) end,
+              {description = "view next nonempty", group = "tag"}),
+
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
             {description = "go back", group = "tag"}),
 
-    -- Non-empty tag browsing (Not Default)
-    awful.key({ altkey }, "Left", function() lain.util.tag_view_nonempty(-1) end,
-              {description = "view previous nonempty", group = "tag"}),
-    awful.key({ altkey }, "Right", function() lain.util.tag_view_nonempty(1) end,
-              {description = "view next nonempty", group = "tag"}),
 
     -- Default client keys
     awful.key({ modkey,           }, "j",
