@@ -50,10 +50,10 @@ return {
     },
 
     --FIXME: tag must be icon, additional name would be better
-    { rule = { class = "icedove"},
+    { rule = { class = "Thunderbird"},
         properties = { screen = 1, tag = "" } },
     { rule = { class = "chromium"},
-        properties = { screen = 1, tag = "" } },
+        properties = { screen = 1, tag = ""} },
     { rule = { class = "Gajim" },
         properties = { screen = 1, tag = "" } },
     { rule = { class = "Evince" },
