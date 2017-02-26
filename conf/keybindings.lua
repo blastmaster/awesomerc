@@ -308,6 +308,7 @@ keybindings.globalkeys = awful.util.table.join(
     --end, {description = "lock screen", group = "client"}),
 
     -- Prompt
+    -- TODO: define comand in theme
     awful.key({ modkey }, "r",
         function()
             awful.spawn("dmenu_run -b -i -p 'Run:' -nb '" .. beautiful.bg_normal .. "' \
@@ -385,7 +386,7 @@ keybindings.clientbuttons = awful.util.table.join(
 
 -- Define clientkeys
 keybindings.clientkeys = awful.util.table.join(
-    awful.key({ altkey, "Shift" }, "m", lain.util.magnify_client,
+    awful.key({ modkey, "Shift" }, "m", lain.util.magnify_client,
               {description = "magnify client", group = "client"}
     ),
     awful.key({ modkey,           }, "f",
