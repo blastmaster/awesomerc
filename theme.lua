@@ -300,6 +300,14 @@ play_pause_icon:buttons(awful.util.table.join(awful.button({}, 1,
                             theme.mpd.update()
                         end)))
 
+function theme.lock()
+    awful.spawn.with_shell("i3lock -t -i ~/Pictures/prometheus.png")
+end
+
+function theme.lock_and_suspend()
+    awful.spawn.with_shell("i3lock -t -i ~/Pictures/prometheus.png")
+    awful.spawn.with_shell("systemctl suspend")
+end
 
 function theme.at_screen_connect(s)
     -- Quake application
