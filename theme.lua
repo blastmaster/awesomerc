@@ -74,6 +74,9 @@ theme.nex                                       = theme.icon_dir .. "/next.png"
 theme.stop                                      = theme.icon_dir .. "/stop.png"
 theme.pause                                     = theme.icon_dir .. "/pause.png"
 theme.play                                      = theme.icon_dir .. "/play.png"
+theme.lock_icon                                 = theme.icon_dir .. "/system-lock-screen.png"
+theme.suspend_icon                              = theme.icon_dir .. "/system-suspend.png"
+theme.terminal_icon                             = theme.icon_dir .. "/terminal.png"
 
 theme.useless_gap                               = 4
 

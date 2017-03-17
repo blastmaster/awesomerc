@@ -107,12 +107,12 @@ local mymenu = freedesktop.menu.build({
     icon_size = beautiful.menu_height or 16,
     before = {
         { "Awesome", myawesomemenu, beautiful.awesome_icon },
-        { "Lock", beautiful.lock },
+        { "Lock", beautiful.lock, beautiful.lock_icon},
         -- other stuff put here
     },
     after = {
-        { "Open terminal", terminal },
-        { "Suspend", beautiful.lock_and_suspend },
+        { "Open terminal", terminal, beautiful.terminal_icon },
+        { "Suspend", beautiful.lock_and_suspend, beautiful.suspend_icon },
         -- other stuff put here
     }
 })
