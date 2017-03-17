@@ -94,7 +94,7 @@ theme.taglist_squares_unsel = dir .. "/square.png"
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
-theme.menu_submenu_icon = dir .. "/submenu.png"
+theme.menu_submenu_icon = dir .. "/submenu_white.png"
 theme.menu_height = 14
 theme.menu_width  = 160
 theme.menu_icon_size = 32
