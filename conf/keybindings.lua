@@ -79,14 +79,21 @@ keybindings.globalkeys = awful.util.table.join(
         end,
         {description = "go back", group = "client"}),
 
-    -- Show/Hide wibox
+    -- Show/Hide bottom wibox 
     awful.key({ modkey }, "b",
         function ()
             for s in screen do
+                s.mybottombox.visible = not s.mybottombox.visible
+            end
+        end,
+        {description = "Show/Hide bottom Wibox", group = "awesome"}
+    ),
+
+    -- Show/Hide wibox
+    awful.key({ modkey, "Shift" }, "b",
+        function ()
+            for s in screen do
                 s.mywibox.visible = not s.mywibox.visible
-                if s.mybottomwibox then
-                    s.mybottomwibox.visible = not s.mybottomwibox.visible
-                end
             end
         end,
         {description = "Show/Hide Wibox", group = "awesome"}

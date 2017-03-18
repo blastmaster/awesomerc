@@ -360,8 +360,6 @@ function theme.at_screen_connect(s)
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
-            cpu_icon,
-            cpuwidget,
             musicwidget,
             play_pause_icon,
             mpd_icon,
@@ -370,6 +368,24 @@ function theme.at_screen_connect(s)
             clockwidget,
         },
     }
+
+    -- Create bottom wibox
+    s.mybottombox = awful.wibar({ position = "bottom", screen = s, height = 20, bg = theme.bg_normal, fg = theme.fg_normal })
+
+    -- Add widgets to bottom wibox
+    s.mybottombox:setup({
+        layout = wibox.layout.fixed.horizontal,
+        --layout = wibox.layout.align.horizontal,
+        {
+            layout = wibox.layout.fixed.horizontal,
+            cpu_icon,
+            cpuwidget,
+        },
+    })
+
+    -- make bottom wibox invisible by default
+    s.mybottombox.visible = false
+
 end
 
 return theme
