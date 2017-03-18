@@ -380,6 +380,9 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
             cpu_icon,
             cpuwidget,
+            netdown_icon,
+            networkwidget,
+            netup_icon,
         },
     })
 
