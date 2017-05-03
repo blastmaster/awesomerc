@@ -237,7 +237,7 @@ keybindings.globalkeys = awful.util.table.join(
     ),
     awful.key({ altkey, }, "Down",
         function ()
-            os.execute(string.format("amixer set %s %1%%-", beautiful.volume.channel))
+            os.execute(string.format("amixer set %s 1%%-", beautiful.volume.channel))
             beautiful.volume.update()
         end,
         {description = "decrease volume", group = "alsa"}
