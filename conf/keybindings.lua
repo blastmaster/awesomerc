@@ -195,14 +195,6 @@ keybindings.globalkeys = awful.util.table.join(
         {description = "Show running Programms", group = "awesome"}
     ),
 
-    -- Dropdown application
-    awful.key({ modkey, }, "F1",
-        function()
-            awful.screen.focused().quake:toggle()
-        end,
-        {description = "Toggle dropdown terminal", group = "awesome"}
-    ),
-
     -- Widget popups
     awful.key({ altkey, }, "c",
         function ()

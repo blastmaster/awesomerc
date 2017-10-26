@@ -78,8 +78,6 @@ theme.lock_icon                                 = theme.icon_dir .. "/system-loc
 theme.suspend_icon                              = theme.icon_dir .. "/system-suspend.png"
 theme.terminal_icon                             = theme.icon_dir .. "/terminal.png"
 
-theme.useless_gap                               = 4
-
 -- There are other variable sets
 -- overriding the default one when
 -- defined, the sets are:
@@ -150,13 +148,8 @@ theme.titlebar_maximized_button_focus_inactive  = dir .. "/titlebar/maximized_fo
 theme.titlebar_maximized_button_normal_active = dir .. "/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active  = dir .. "/titlebar/maximized_focus_active.png"
 
-theme.wallpapers = {
-    {"/home/soeste/Pictures/wallpaper.jpg", maximize=true}
-}
-
--- setting random default wallpaper
-idx = math.random(1, table.getn(theme.wallpapers))
-theme.wallpaper = theme.wallpapers[idx][1]
+-- set wallpaper
+theme.wallpaper = "/home/soeste/Pictures/wallpaper.jpg"
 
 -- You can use your own layout icons like this:
 theme.layout_fairh = dir .. "/layouts/fairh.png"
@@ -313,11 +306,6 @@ function theme.lock_and_suspend()
 end
 
 function theme.at_screen_connect(s)
-    -- Quake application
-    s.quake = lain.util.quake({app = awful.util.terminal,
-                               extra = "-e start_tmux.sh",
-                               height = 0.45})
-
     -- If wallpaper is a function, call it with screen
     if type(wallpaper) == "function" then
         theme.wallpaper = theme.wallpaper()
