@@ -1,7 +1,8 @@
+pcall(require, "luarocks.loader")
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
-              require("awful.autofocus")
+require("awful.autofocus")
 -- Widget and layout library
 local wibox = require("wibox")
 -- Theme handling library
@@ -286,4 +287,9 @@ client.connect_signal("focus",
     end)
 
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+
+local _, posix = pcall(require, "posix")
+if posix then
+    posix.setenv('QT_QPA_PLATFORMTHEME','kde')
+end
 -- }}}
